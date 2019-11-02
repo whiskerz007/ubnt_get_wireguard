@@ -32,7 +32,7 @@ function log() {
   while read TEXT; do
     local LOG_PATH=/tmp/`basename "${0%.*}"`.log
     if [ ! -f $LOG_PATH ]; then
-      sg vyattacfg -c "touch $LOG_PATH"
+      touch $LOG_PATH
       chmod 664 $LOG_PATH
     fi
     local LOG_MAX_LINES=10000
@@ -66,6 +66,14 @@ function vyatta_cfg_teardown() {
     die "Failure occured while tearing down vyatta configuration session."
   fi
 }
+function add_to_path() {
+  if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+    PATH="${PATH:+"$PATH:"}$1"
+  fi
+}
+if [ "$(id -g -n)" != 'vyattacfg' ] ; then
+  exec sg vyattacfg -c "$(readlink -f $0) $@"
+fi
 OVERRIDE_VERSION=${1:-}
 [[ $EUID -ne 0 ]] && SUDO='sudo'
 SUDO=${SUDO:-}
@@ -78,6 +86,9 @@ VYATTA_DELETE=${VYATTA_SBIN}/my_delete
 VYATTA_COMMIT=${VYATTA_SBIN}/my_commit
 VYATTA_SESSION=$(cli-shell-api getSessionEnv $$)
 eval $VYATTA_SESSION
+export vyatta_sbindir=$VYATTA_SBIN
+add_to_path /usr/sbin
+add_to_path /sbin
 
 # Get board type
 BOARD=$(
