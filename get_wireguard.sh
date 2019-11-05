@@ -115,7 +115,7 @@ FIRMWARE=$(
 info "Firmware version: $FIRMWARE"
 
 # Get installed WireGuard version
-INSTALLED_VERSION=$(dpkg-query --show --showformat='${Version}' wireguard 2> /dev/null)
+INSTALLED_VERSION=$(dpkg-query --show --showformat='${Version}' wireguard 2> /dev/null || true)
 info "Installed WireGuard version: $INSTALLED_VERSION"
 
 # Get list of releases
