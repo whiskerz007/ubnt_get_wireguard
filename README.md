@@ -1,4 +1,4 @@
-# Download and install WireGaurd on Ubiquiti edge devices
+# Download and install WireGuard on Ubiquiti edge devices
 
 ***Warning:*** _This script attempts to preserve your running configuration, however you should have a backup your configuration before running this script._
  
