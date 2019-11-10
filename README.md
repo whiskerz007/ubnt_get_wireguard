@@ -6,7 +6,7 @@ This script will reference [Lochnair/vyatta-wireguard](https://github.com/Lochna
 
 ```
 cd /config/scripts
-curl -O --silent https://raw.githubusercontent.com/whiskerz007/ubnt_get_wireguard/master/get_wireguard.sh
+curl -LO --silent https://github.com/whiskerz007/ubnt_get_wireguard/raw/master/get_wireguard.sh
 chmod +x get_wireguard.sh
 ```
 
