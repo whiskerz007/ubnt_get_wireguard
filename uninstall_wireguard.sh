@@ -91,4 +91,12 @@ msg 'Uninstalling WireGuard...'
 ${SUDO-} dpkg --purge wireguard &> /dev/null || \
   die "A problem occured while installing the package."
 
+# Remove firstboot package
+FIRSTBOOT_DEB='/config/data/firstboot/install-packages/wireguard.deb'
+if [ -f $FIRSTBOOT_DEB ]; then
+  msg 'Removing WireGuard installation after firmware update...'
+  ${SUDO-} rm $FIRSTBOOT_DEB || \
+    warn "Failure removing debian package from firstboot path."
+fi
+
 msg 'WireGuard has been successfully uninstalled.'
