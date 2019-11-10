@@ -40,3 +40,11 @@ commit
 save
 exit
 ```
+
+## Uninstall
+
+To uninstall WireGuard, run the following command.
+
+```
+curl -L https://github.com/whiskerz007/ubnt_get_wireguard/raw/master/uninstall_wireguard.sh | sg vyattacfg
+```
