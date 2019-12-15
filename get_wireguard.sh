@@ -104,6 +104,8 @@ case $BOARD in
   e120)  BOARD='ugw3';;
   e221)  BOARD='ugw4';;
   e1020) BOARD='ugwxg';;
+  mt7621) BOARD='e50';; #v.1.10
+  'mediatek mt7621 ver:1 eco:3') BOARD='e50';; #v.2.0
 esac
 info "Board type detected: $BOARD"
 
