@@ -71,9 +71,14 @@ function add_to_path() {
     PATH="${PATH:+"$PATH:"}$1"
   fi
 }
+
+# Script must run as group 'vyattacfg' to prevent errors and system instability
 if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-  exec sg vyattacfg -c "$(readlink -f $0) $@"
+  # Replace current shell with this script running as group 'vyattacfg' with
+  # identical bash options and parameters
+  exec sg vyattacfg -c "$(which bash) -$- $(readlink -f $0) $*"
 fi
+
 OVERRIDE_VERSION=${1:-}
 [[ $EUID -ne 0 ]] && SUDO='sudo'
 SUDO=${SUDO:-}
