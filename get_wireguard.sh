@@ -100,21 +100,21 @@ BOARD_MODEL=$(
 info "Board model: $BOARD_MODEL"
 
 # Get board type
-BOARD=$(
-  cat /proc/cpuinfo | \
-  grep 'system type' | \
-  awk -F ': ' '{print tolower($2)}' | \
-  sed 's/ubnt_//'
+BOARD_TYPE=$(
+  cut -d'.' -f2 <<< cat /etc/version | \
+  sed 's/ER-//I'
 )
-[ -z $BOARD ] && die "Unable to get board type."
+[ -z "$BOARD_TYPE" ] && die "Unable to get board type."
+info "Board type: $BOARD_TYPE"
 
-# Change board type to match repo mapping
-case $BOARD in
-  e120)  BOARD='ugw3';;
-  e221)  BOARD='ugw4';;
-  e1020) BOARD='ugwxg';;
+# Set board mapping to match repo
+case $BOARD_TYPE in
+  e120)  BOARD_MAP='ugw3';;
+  e220)  BOARD_MAP='ugw4';;
+  e1020) BOARD_MAP='ugwxg';;
+  *)     BOARD_MAP=$BOARD_TYPE;;
 esac
-info "Board type detected: $BOARD"
+info "Board repo mapping: $BOARD_MAP"
 
 # Get firmware version
 FIRMWARE=$(
@@ -151,7 +151,7 @@ fi
 
 # Get debian package URL
 GITHUB_RELEASE_ASSETS=$(
-  jq '.assets[] | select(.name | contains("'${BOARD}'-"))' <<< $GITHUB_RELEASE
+  jq '.assets[] | select(.name | contains("'${BOARD_MAP}'-"))' <<< $GITHUB_RELEASE
 )
 case $(cut -d'.' -f1 <<< $FIRMWARE) in
   v2) GITHUB_RELEASE_ASSET=$(jq 'select(.name | contains("v2"))' <<< $GITHUB_RELEASE_ASSETS);;
