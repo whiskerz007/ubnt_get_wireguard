@@ -219,7 +219,7 @@ $SUDO dpkg -i $DEB_PATH &> /dev/null || \
 # If WireGuard was previously installed
 if [ -f $RUNNING_CONFIG_BACKUP_PATH ]; then
   # Load backup configuration
-  msg 'Retoring previous running configuration...'
+  msg 'Restoring previous running configuration...'
   vyatta_cfg_setup
   $VYATTA_API loadFile $RUNNING_CONFIG_BACKUP_PATH
   $VYATTA_COMMIT
