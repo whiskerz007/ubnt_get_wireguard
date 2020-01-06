@@ -90,6 +90,15 @@ export vyatta_sbindir=$VYATTA_SBIN
 add_to_path /usr/sbin
 add_to_path /sbin
 
+# Get board model
+BOARD_MODEL=$(
+  /usr/sbin/ubnt-hal show-version | \
+  grep 'HW model' | \
+  sed 's/^.*:\s*//'
+)
+[ -z "$BOARD_MODEL" ] && die "Unable to get board model."
+info "Board model: $BOARD_MODEL"
+
 # Get board type
 BOARD=$(
   cat /proc/cpuinfo | \
