@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -o errexit  #Exit immediately if a pipeline returns a non-zero status
+set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell
+set -o nounset  #Treat unset variables as an error
+set -o pipefail #Pipe will exit with last non-zero status if applicable
 shopt -s expand_aliases
 alias die='EXIT=$? LINE=$LINENO error_exit'
 trap die ERR
 trap cleanup EXIT
+
 function error_exit() {
   trap - ERR
   local DEFAULT='Unknown failure occured.'

@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -o errexit  #Exit immediately if a pipeline returns a non-zero status
+set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell
+set -o nounset  #Treat unset variables as an error
+set -o pipefail #Pipe will exit with last non-zero status if applicable
 shopt -s expand_aliases
 alias die='EXIT=$? LINE=$LINENO error_exit'
 trap die ERR
 trap cleanup EXIT
+
 function error_exit() {
   trap - ERR
   local DEFAULT='Unknown failure occured.'
@@ -41,19 +45,22 @@ function add_to_path() {
     fi
   done
 }
+
+if [ "$(id -g -n)" != 'vyattacfg' ] ; then
+  die "Unable to continue running script without 'vyattacfg' group permission."
+fi
 [[ $EUID -ne 0 ]] && SUDO='sudo'
+add_to_path /sbin /usr/sbin
+
+# Setup vyatta environment
 VYATTA_SBIN=/opt/vyatta/sbin
 VYATTA_API=${VYATTA_SBIN}/my_cli_shell_api
 VYATTA_SET=${VYATTA_SBIN}/my_set
 VYATTA_DELETE=${VYATTA_SBIN}/my_delete
 VYATTA_COMMIT=${VYATTA_SBIN}/my_commit
 VYATTA_SESSION=$(cli-shell-api getSessionEnv $$)
-if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-  die "Unable to continue running script without 'vyattacfg' group permission."
-fi
 eval $VYATTA_SESSION
 export vyatta_sbindir=$VYATTA_SBIN
-add_to_path /sbin /usr/sbin
 
 # If WireGuard configuration exists
 if $($VYATTA_API existsActive interfaces wireguard); then
