@@ -1,6 +1,6 @@
 # Download and install WireGuard on Ubiquiti edge devices
 
-***Warning:*** _This script attempts to preserve your running configuration, however you should have a backup your configuration before running this script._
+***Warning:*** _This script attempts to preserve your running configuration, however you should have a backup of your configuration before running this script._
  
 This script will reference [Lochnair/vyatta-wireguard](https://github.com/Lochnair/vyatta-wireguard) repo for WireGuard releases. It will download, install, and setup the package to install post firmware upgrade. Rebooting the device is **not** required after running this script as long as the script did not generate any errors. Grab the script by running the following commands from the web CLI or SSH.
 
@@ -11,6 +11,8 @@ chmod +x get_wireguard.sh
 ```
 
 ***Note:*** _Best practice is to save scripts into `/config/scripts` directory._
+
+## Usage
 
 To download and install the latest release of WireGuard, run the following command.
 
