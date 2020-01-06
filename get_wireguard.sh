@@ -77,19 +77,14 @@ if [ "$(id -g -n)" != 'vyattacfg' ] ; then
   exec sg vyattacfg -c "$(which bash) -$- $(readlink -f $0) $*"
 fi
 
+# Default variables
 OVERRIDE_VERSION=${1:-}
 [[ $EUID -ne 0 ]] && SUDO='sudo'
 SUDO=${SUDO:-}
 TEMP_DIR=$(mktemp -d)
 RUNNING_CONFIG_BACKUP_PATH=${TEMP_DIR}/config.run
-VYATTA_SBIN=/opt/vyatta/sbin
-VYATTA_API=${VYATTA_SBIN}/my_cli_shell_api
-VYATTA_SET=${VYATTA_SBIN}/my_set
-VYATTA_DELETE=${VYATTA_SBIN}/my_delete
-VYATTA_COMMIT=${VYATTA_SBIN}/my_commit
-VYATTA_SESSION=$(cli-shell-api getSessionEnv $$)
-eval $VYATTA_SESSION
-export vyatta_sbindir=$VYATTA_SBIN
+
+# Required when script is executed from vyatta task-scheduler
 add_to_path /usr/sbin
 add_to_path /sbin
 
@@ -175,6 +170,16 @@ curl --silent --location $DEB_URL -o $DEB_PATH || \
 msg 'Checking WireGuard package integrity...'
 dpkg-deb --info $DEB_PATH &> /dev/null || \
   die "Debian package integrity check failed for package."
+
+# Setup vyatta environment
+VYATTA_SBIN=/opt/vyatta/sbin
+VYATTA_API=${VYATTA_SBIN}/my_cli_shell_api
+VYATTA_SET=${VYATTA_SBIN}/my_set
+VYATTA_DELETE=${VYATTA_SBIN}/my_delete
+VYATTA_COMMIT=${VYATTA_SBIN}/my_commit
+VYATTA_SESSION=$(cli-shell-api getSessionEnv $$)
+eval $VYATTA_SESSION
+export vyatta_sbindir=$VYATTA_SBIN #Required for some vyatta-wireguard templates to work
 
 # If WireGuard configuration exists
 if $($VYATTA_API existsActive interfaces wireguard); then
