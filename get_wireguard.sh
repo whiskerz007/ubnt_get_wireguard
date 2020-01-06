@@ -48,16 +48,14 @@ function log() {
   done
 }
 function cleanup() {
-  vyatta_cfg_session && vyatta_cfg_teardown
+  if [ ! -z ${VYATTA_API+x} ] && $($VYATTA_API inSession); then
+    vyatta_cfg_teardown
+  fi
   rm -rf $TEMP_DIR
-}
-function vyatta_cfg_session() {
-  $VYATTA_API inSession
-  return $?
 }
 function vyatta_cfg_setup() {
   $VYATTA_API setupSession
-  if ! vyatta_cfg_session; then
+  if ! $($VYATTA_API inSession); then
     die "Failure occured while setting up vyatta configuration session."
   fi
 }
