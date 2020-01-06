@@ -89,7 +89,7 @@ fi
 # Uninstall WireGuard package
 msg 'Uninstalling WireGuard...'
 ${SUDO-} dpkg --purge wireguard &> /dev/null || \
-  die "A problem occured while installing the package."
+  die "A problem occured while uninstalling the package."
 
 # Remove firstboot package
 FIRSTBOOT_DEB='/config/data/firstboot/install-packages/wireguard.deb'
