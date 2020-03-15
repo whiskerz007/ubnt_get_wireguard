@@ -130,7 +130,7 @@ info "Installed WireGuard version: $INSTALLED_VERSION"
 
 # Get list of releases
 GITHUB_API='https://api.github.com'
-GITHUB_REPO='Lochnair/vyatta-wireguard'
+GITHUB_REPO='FossoresLP/vyatta-wireguard'
 GITHUB_RELEASES_URL="${GITHUB_API}/repos/${GITHUB_REPO}/releases"
 GITHUB_RELEASES=$(curl --silent $GITHUB_RELEASES_URL)
 
