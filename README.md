@@ -2,7 +2,7 @@
 
 ***Warning:*** _This script attempts to preserve your running configuration, however you should have a backup of your configuration before running this script._
  
-This script will reference [Lochnair/vyatta-wireguard](https://github.com/Lochnair/vyatta-wireguard) repo for WireGuard releases. It will download, install, and setup the package to install post firmware upgrade. Rebooting the device is **not** required after running this script as long as the script did not generate any errors. Grab the script by running the following commands from the web CLI or SSH.
+This script will reference [WireGuard/wireguard-vyatta-ubnt](https://github.com/WireGuard/wireguard-vyatta-ubnt) repo for WireGuard releases. It will download, install, and setup the package to install post firmware upgrade. Rebooting the device is **not** required after running this script as long as the script did not generate any errors. Grab the script by running the following commands from the web CLI or SSH.
 
 ```
 cd /config/scripts
