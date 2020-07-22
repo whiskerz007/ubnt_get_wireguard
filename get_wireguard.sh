@@ -134,14 +134,18 @@ GITHUB_REPO='WireGuard/wireguard-vyatta-ubnt'
 GITHUB_RELEASES_URL="${GITHUB_API}/repos/${GITHUB_REPO}/releases"
 GITHUB_RELEASES=$(curl --silent $GITHUB_RELEASES_URL)
 
-# Get release version
-RELEASE_VERSION=${OVERRIDE_VERSION:-}
-if [ ! -z $RELEASE_VERSION ]; then
-  GITHUB_RELEASE=$(jq '.[] | select(.tag_name == "'${RELEASE_VERSION}'")' <<< $GITHUB_RELEASES)
+# Set jq query strings
+if [ ! -z $OVERRIDE_VERSION ]; then
+  # Get the release for the override version
+  QUERY="[.[]][] | select(.tag_name == \"$OVERRIDE_VERSION\") |"
 else
-  GITHUB_RELEASE=$(jq '[.[]][0]' <<< $GITHUB_RELEASES)
-  RELEASE_VERSION=$(jq -r '.tag_name' <<< $GITHUB_RELEASE)
+  # Get the latest release
+  QUERY="[.[]][0]"
 fi
+
+# Get release version
+RELEASE_VERSION=$(jq -r "$QUERY .tag_name" <<< $GITHUB_RELEASES)
+[ -z $RELEASE_VERSION ] && die "Invalid release version supplied."
 info "Release version: $RELEASE_VERSION"
 
 # Check if override is not present and release version is newer than installed
@@ -151,21 +155,14 @@ if [ -z $OVERRIDE_VERSION ] && $(dpkg --compare-versions "$RELEASE_VERSION" 'le'
 fi
 
 # Get debian package URL
-GITHUB_RELEASE_ASSETS=$(
-  jq '.assets[] | select(.name | contains("'${BOARD_MAP}'-"))' <<< $GITHUB_RELEASE
-)
-case $(cut -d'.' -f1 <<< $FIRMWARE) in
-  v2) GITHUB_RELEASE_ASSET=$(jq 'select(.name | contains("v2"))' <<< $GITHUB_RELEASE_ASSETS);;
-  v1) GITHUB_RELEASE_ASSET=$(jq 'select(.name | contains("v2") | not)' <<< $GITHUB_RELEASE_ASSETS);;
-  *) die "Unable to proceed with your firmware.";;
-esac
-DEB_URL=$(jq -r '.browser_download_url' <<< $GITHUB_RELEASE_ASSET)
+[[ ! $BOARD_MAP = ugw* ]] && FIRMWARE_FILTER="| select(.name | contains(\"$(cut -d'.' -f1 <<< $FIRMWARE)-\"))"
+DEB_URL=$(jq -r "[$QUERY .assets[] | select(.name | contains(\"$BOARD_MAP-\")) ${FIRMWARE_FILTER:-}][0].browser_download_url" <<< $GITHUB_RELEASES)
 [ -z $DEB_URL ] && die "Failed to locate debian package for your board and firmware."
 info "Debian package URL: $DEB_URL"
 
 # Download the package
 msg 'Downloading WireGuard package...'
-DEB_PATH=${TEMP_DIR}/$(jq -r '.name' <<< $GITHUB_RELEASE_ASSET)
+DEB_PATH=${TEMP_DIR}/$(basename $DEB_URL)
 curl --silent --location $DEB_URL -o $DEB_PATH || \
   die "Failure downloading debian package."
 
