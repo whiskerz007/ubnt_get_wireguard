@@ -194,7 +194,7 @@ if $($VYATTA_API existsActive interfaces wireguard); then
   msg 'Removing running WireGuard configuration...'
   vyatta_cfg_setup
   INTERFACES=( $($VYATTA_API listNodes interfaces wireguard | sed "s/'//g") )
-  for INTERFACE in $INTERFACES; do
+  for INTERFACE in ${INTERFACES[@]}; do
     if [ "$($VYATTA_API returnValue interfaces wireguard $INTERFACE route-allowed-ips)" == "true" ]; then
       $VYATTA_SET interfaces wireguard $INTERFACE route-allowed-ips false
       $VYATTA_COMMIT
