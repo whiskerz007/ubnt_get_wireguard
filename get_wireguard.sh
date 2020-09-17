@@ -198,7 +198,7 @@ if $($VYATTA_API existsActive interfaces wireguard); then
     fi
     INTERFACE_ADDRESSES=( $(ip -oneline address show dev $INTERFACE | awk '{print $4}') )
     for IP in $($VYATTA_API returnValues interfaces wireguard $INTERFACE address | sed "s/'//g"); do
-      [[ $IP != "${INTERFACE_ADDRESSES[@]}" ]] && ip address add $IP dev $INTERFACE
+      [[ ! " ${INTERFACE_ADDRESSES[@]} " =~ " $IP " ]] && ip address add $IP dev $INTERFACE
     done
   done
   $VYATTA_DELETE interfaces wireguard
