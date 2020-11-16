@@ -140,7 +140,7 @@ if [ ! -z $OVERRIDE_VERSION ]; then
   QUERY="[.[]][] | select(.tag_name == \"$OVERRIDE_VERSION\") |"
 else
   # Get the latest release
-  QUERY="[.[]][0]"
+  QUERY="[[.[]][] | select(.prerelease == false)][0]"
 fi
 
 # Get release version
