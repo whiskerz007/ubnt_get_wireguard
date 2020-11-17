@@ -1,4 +1,28 @@
 #!/usr/bin/env bash
+###############################################################################
+#         File:  get_wireguard.sh                                             #
+#                                                                             #
+#        Usage:  get_wireguard.sh [VERSION]                                   #
+#                                                                             #
+#  Description:  Download and install WireGuard on Ubiquiti routers that will #
+#                persist through firmware upgrades. If WireGuard is already   #
+#                installed, the WireGuard configuration will be backed up and #
+#                removed, WireGuard will be updated to the selected version,  #
+#                the backed up WireGuard configuration will be restored, and  #
+#                the WireGuard installation package will be stored so that it #
+#                will be reinstall after firmware upgrades.                   #
+#                                                                             #
+#   Parameters:  VERSION                                                      #
+#                    Install version that has been published to GitHub        #
+#                    WireGuard/wireguard-vyatta-ubnt releases. When version   #
+#                    is omitted, the latest release is selected.              #
+#                                                                             #
+#        Notes:  Ensure you have a recent backup of the WireGuard             #
+#                configuration before running this script.                    #
+#       Author:  whiskerz007                                                  #
+#      Website:  https://github.com/whiskerz007/ubnt_get_wireguard            #
+#      License:  MIT                                                          #
+###############################################################################
 
 set -o errexit  #Exit immediately if a pipeline returns a non-zero status
 set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell

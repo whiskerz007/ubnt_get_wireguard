@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
+###############################################################################
+#         File:  uninstall_wireguard.sh                                       #
+#                                                                             #
+#        Usage:  uninstall_wireguard.sh                                       #
+#                                                                             #
+#  Description:  Uninstall WireGuard from Ubiquiti routers and remove         #
+#                persistent package.                                          #
+#                                                                             #
+#       Author:  whiskerz007                                                  #
+#      Website:  https://github.com/whiskerz007/ubnt_get_wireguard            #
+#      License:  MIT                                                          #
+###############################################################################
 
 set -o errexit  #Exit immediately if a pipeline returns a non-zero status
 set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell
