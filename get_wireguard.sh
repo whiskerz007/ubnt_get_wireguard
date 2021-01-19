@@ -243,7 +243,7 @@ msg 'Installing WireGuard...'
 $SUDO dpkg -i $DEB_PATH &> /dev/null || \
   die "A problem occured while installing the package."
 
-# If WireGuard was previously installed
+# If WireGuard was previously configured
 if [ -f $RUNNING_CONFIG_BACKUP_PATH ]; then
   # Load backup configuration
   msg 'Restoring previous running configuration...'
