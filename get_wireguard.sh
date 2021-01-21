@@ -24,10 +24,7 @@
 #      License:  MIT                                                          #
 ###############################################################################
 
-set -o errexit  #Exit immediately if a pipeline returns a non-zero status
-set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell
-set -o nounset  #Treat unset variables as an error
-set -o pipefail #Pipe will exit with last non-zero status if applicable
+set -eEu -o pipefail
 shopt -s expand_aliases
 alias die='EXIT=$? LINE=$LINENO error_exit'
 trap die ERR
@@ -57,20 +54,14 @@ function msg() {
 }
 function log() {
   while read TEXT; do
-    local LOG_PATH=/tmp/`basename "${0%.*}"`.log
-    if [ ! -f $LOG_PATH ]; then
-      touch $LOG_PATH
-      chmod 664 $LOG_PATH
-    fi
-    local LOG_MAX_LINES=10000
     if [ -f $LOG_PATH ] && [ $(wc -l $LOG_PATH | cut -f1 -d' ') -ge $LOG_MAX_LINES ]; then
       local LOG=$(cat $LOG_PATH)
       tail -n $(($LOG_MAX_LINES-1)) > $LOG_PATH <<<$LOG
     fi
     local TIMESTAMP=$(date '+%FT%T%z')
-    local REGEX='\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]'
+    local ANSI_ESCAPE_SEQUENCES='\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]'
     echo -e "$TEXT" | tee -a >(
-      sed -r "s/^/$TIMESTAMP: /; s/$REGEX//g" >> $LOG_PATH
+      sed -r "s/^/$TIMESTAMP: /; s/$ANSI_ESCAPE_SEQUENCES//g" >> $LOG_PATH
     )
   done
 }
@@ -91,11 +82,6 @@ function vyatta_cfg_teardown() {
     die "Failure occured while tearing down vyatta configuration session."
   fi
 }
-function add_to_path() {
-  if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-    PATH="${PATH:+"$PATH:"}$1"
-  fi
-}
 
 # Script must run as group 'vyattacfg' to prevent errors and system instability
 if [ "$(id -g -n)" != 'vyattacfg' ] ; then
@@ -105,6 +91,9 @@ if [ "$(id -g -n)" != 'vyattacfg' ] ; then
 fi
 
 # Default variables
+LOG_MAX_LINES=10000
+LOG_PATH=/tmp/`basename "${0%.*}"`.log
+[ ! -f $LOG_PATH ] && touch $LOG_PATH && chmod 664 $LOG_PATH
 OVERRIDE_VERSION=${1:-}
 [[ $EUID -ne 0 ]] && SUDO='sudo'
 SUDO=${SUDO:-}
@@ -112,8 +101,13 @@ TEMP_DIR=$(mktemp -d)
 RUNNING_CONFIG_BACKUP_PATH=${TEMP_DIR}/config.run
 
 # Required when script is executed from vyatta task-scheduler
-add_to_path /usr/sbin
-add_to_path /sbin
+for DIR in {,/usr}/sbin; do
+  # If DIR does not exist in PATH variable
+  if [ -d "$DIR" ] && [[ ":$PATH:" != *":$DIR:"* ]]; then
+    # Append DIR to PATH variable
+    PATH="${PATH:+"$PATH:"}$DIR"
+  fi
+done
 
 # Get board model
 BOARD_MODEL=$(
