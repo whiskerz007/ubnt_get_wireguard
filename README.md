@@ -18,7 +18,7 @@ This script installs and maintaince the wireguard vpn solution on a ubiquiti rou
 This script will reference [WireGuard/wireguard-vyatta-ubnt](https://github.com/WireGuard/wireguard-vyatta-ubnt) repo for WireGuard releases. It will download, install, and setup the package to install post firmware upgrade. Rebooting the device is **not** required after running this script as long as the script did not generate any errors. Grab the script by running the following commands from the web CLI or SSH.
 
 ```
-curl -L --silent https://github.com/whiskerz007/ubnt_get_wireguard/raw/master/get_wireguard.sh -o /config/scripts/get_wireguard.sh && chmod +x /config/scripts/get_wireguard.sh
+sudo curl -L --silent https://github.com/whiskerz007/ubnt_get_wireguard/raw/master/get_wireguard.sh -o /config/scripts/get_wireguard.sh && sudo chmod +x /config/scripts/get_wireguard.sh
 ```
 
 ***Note:*** _Best practice is to save scripts into `/config/scripts` directory._
