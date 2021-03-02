@@ -76,19 +76,22 @@ export vyatta_sbindir=$VYATTA_SBIN
 # If WireGuard configuration exists
 if $($VYATTA_API existsActive interfaces wireguard); then
   # Remove running WireGuard configuration
-  msg 'Removing running WireGuard configuration...'
   vyatta_cfg_setup
-  INTERFACES=( $($VYATTA_API listNodes interfaces wireguard | sed "s/'//g") )
-  for INTERFACE in ${INTERFACES[@]}; do
-    if [ "$($VYATTA_API returnValue interfaces wireguard $INTERFACE route-allowed-ips)" == "true" ]; then
-      $VYATTA_SET interfaces wireguard $INTERFACE route-allowed-ips false
-      $VYATTA_COMMIT
-    fi
-    INTERFACE_ADDRESSES=( $(ip -oneline address show dev $INTERFACE | awk '{print $4}') )
-    for IP in $($VYATTA_API returnValues interfaces wireguard $INTERFACE address | sed "s/'//g"); do
-      [[ ! " ${INTERFACE_ADDRESSES[@]} " =~ " $IP " ]] && ip address add $IP dev $INTERFACE
+  if dpkg --compare-versions "$INSTALLED_VERSION" 'le' '1.0.20210219-1'; then
+    msg 'Executing configuration remediation...'
+    INTERFACES=( $($VYATTA_API listNodes interfaces wireguard | sed "s/'//g") )
+    for INTERFACE in ${INTERFACES[@]}; do
+      if [ "$($VYATTA_API returnValue interfaces wireguard $INTERFACE route-allowed-ips)" == "true" ]; then
+        $VYATTA_SET interfaces wireguard $INTERFACE route-allowed-ips false
+        $VYATTA_COMMIT
+      fi
+      INTERFACE_ADDRESSES=( $(ip -oneline address show dev $INTERFACE | awk '{print $4}') )
+      for IP in $($VYATTA_API returnValues interfaces wireguard $INTERFACE address | sed "s/'//g"); do
+        [[ ! " ${INTERFACE_ADDRESSES[@]} " =~ " $IP " ]] && ip address add $IP dev $INTERFACE
+      done
     done
-  done
+  fi
+  msg 'Removing running WireGuard configuration...'
   $VYATTA_DELETE interfaces wireguard
   $VYATTA_COMMIT
   vyatta_cfg_teardown
