@@ -87,6 +87,7 @@ function vyatta_cfg_teardown() {
 if [ "$(id -g -n)" != 'vyattacfg' ] ; then
   # Replace current shell with this script running as group 'vyattacfg' with
   # identical bash options and parameters
+  echo switching group to vyattacfg...
   exec sg vyattacfg -c "$(which bash) -$- $(readlink -f $0) $*"
 fi
 
