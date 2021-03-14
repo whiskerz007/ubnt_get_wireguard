@@ -58,8 +58,10 @@ function add_to_path() {
 }
 
 if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-  die "Unable to continue running script without 'vyattacfg' group permission."
+    echo switching group to vyattacfg...
+    exec sg vyattacfg -c "$(which bash) -$- $(readlink -f $0) $*"
 fi
+
 [[ $EUID -ne 0 ]] && SUDO='sudo'
 add_to_path /sbin /usr/sbin
 
