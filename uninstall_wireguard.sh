@@ -73,6 +73,9 @@ VYATTA_SESSION=$(cli-shell-api getSessionEnv $$)
 eval $VYATTA_SESSION
 export vyatta_sbindir=$VYATTA_SBIN
 
+# Get installed WireGuard version
+INSTALLED_VERSION=$(dpkg-query --show --showformat='${Version}' wireguard 2> /dev/null || true)
+
 # If WireGuard configuration exists
 if $($VYATTA_API existsActive interfaces wireguard); then
   # Remove running WireGuard configuration
